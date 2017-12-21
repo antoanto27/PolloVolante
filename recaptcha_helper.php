@@ -91,6 +91,8 @@ function _recaptcha_http_post($host, $path, $data, $port = 80) {
           		echo 'Your request cannot be completed...';
     		}
   		}
+	
+		$token = $csfr->generate( 'csrf_token' );
       
 
         while ( !feof($fs) )
