@@ -38,8 +38,8 @@
 define("RECAPTCHA_API_SERVER", "http://www.google.com/recaptcha/api");
 define("RECAPTCHA_API_SECURE_SERVER", "https://www.google.com/recaptcha/api");
 define("RECAPTCHA_VERIFY_SERVER", "www.google.com");
-include 'nocsrf.php';
-
+require 'nocsrf.class.php';
+ $csrf = new nocsrf;
 
 /**
  * Encodes the given data into a query string format
@@ -83,16 +83,14 @@ function _recaptcha_http_post($host, $path, $data, $port = 80) {
         if( false == ( $fs = pfsockopen($host, $port, $errno, $errstr, 10) ) ) {
                 trigger_error ('Could not open socket');
         }
-		if (isset($_POST['Change'])) {
-    		if($csrf->check('csrf_token', $_POST, false, 60*19, true)) { // FIXED
-        		fwrite($fs, $http_request);
-    		} 
-			else {
-          		echo 'Your request cannot be completed...';
-    		}
-  		}
+    	if($csrf->check('csrf_token', $http_request, false, 60*19, true)) { // FIXED
+        	fwrite($fs, $http_request);
+    	} 
+		else {
+          	echo 'Your request cannot be completed...';
+    	}
+  		
 	
-		$token = $csfr->generate( 'csrf_token' );
       
 
         while ( !feof($fs) )
