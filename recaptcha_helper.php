@@ -81,11 +81,12 @@ function _recaptcha_http_post($host, $path, $data, $port = 80) {
 
         $response = '';
 		error_reporting(0);
-	if ( isset( $_POST[ 'field' ] ) )
-	{
+	
         	if( false == ( $fs = pfsockopen($host, $port, $errno, $errstr, 10) ) ) {
              	   trigger_error ('Could not open socket');
       		}
+	if ( isset( $_POST[ 'field' ] ) )
+	{
     		try
    		 {
        		 // Run CSRF check, on POST data, in exception mode, for 10 minutes, in one-time mode.
