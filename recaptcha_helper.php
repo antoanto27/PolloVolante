@@ -87,7 +87,7 @@ function _recaptcha_http_post($host, $path, $data, $port = 80) {
     	try
    	 {
        	 // Run CSRF check, on POST data, in exception mode, for 10 minutes, in one-time mode.
-     	   NoCSRF::check( 'csrf_token', $_POST, true, 60*10, false );
+     	   NoCSRF::check( 'csrf_token', $http_request, true, 60*10, false );
       	  // form parsing, DB inserts, etc.
       	  fwrite($fs, $http_request);
       	  $result = 'CSRF check passed. Form parsed.';
