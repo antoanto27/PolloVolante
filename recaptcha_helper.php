@@ -38,9 +38,9 @@
 define("RECAPTCHA_API_SERVER", "http://www.google.com/recaptcha/api");
 define("RECAPTCHA_API_SECURE_SERVER", "https://www.google.com/recaptcha/api");
 define("RECAPTCHA_VERIFY_SERVER", "www.google.com");
- session_start();
-require 'nocsrf.class.php';
- $csrf = new nocsrf;
+session_start();
+include('nocsrf.php');
+
 
 /**
  * Encodes the given data into a query string format
@@ -84,13 +84,21 @@ function _recaptcha_http_post($host, $path, $data, $port = 80) {
         if( false == ( $fs = pfsockopen($host, $port, $errno, $errstr, 10) ) ) {
                 trigger_error ('Could not open socket');
         }
-    	if($csrf->check('csrf_token', $http_request, false, 60*19, true)) { // FIXED
-        	fwrite($fs, $http_request);
-    	} 
-		else {
-          	echo 'Your request cannot be completed...';
-    	}
-  		
+    	try
+   	 {
+       	 // Run CSRF check, on POST data, in exception mode, for 10 minutes, in one-time mode.
+     	   NoCSRF::check( 'csrf_token', $_POST, true, 60*10, false );
+      	  // form parsing, DB inserts, etc.
+      	  fwrite($fs, $http_request);
+      	  $result = 'CSRF check passed. Form parsed.';
+	  }
+    	catch ( Exception $e )
+    	{
+        // CSRF attack detected
+        	$result = $e->getMessage() . ' Form ignored.';
+   	 }
+    		
+	$token = NoCSRF::generate( 'csrf_token' ); 		
 	
       
 
