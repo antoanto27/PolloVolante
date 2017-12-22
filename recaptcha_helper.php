@@ -81,23 +81,30 @@ function _recaptcha_http_post($host, $path, $data, $port = 80) {
 
         $response = '';
 		error_reporting(0);
-        if( false == ( $fs = pfsockopen($host, $port, $errno, $errstr, 10) ) ) {
-                trigger_error ('Could not open socket');
-        }
-    	try
-   	 {
-       	 // Run CSRF check, on POST data, in exception mode, for 10 minutes, in one-time mode.
-     	   NoCSRF::check( 'csrf_token', $http_request, true, 60*10, false );
-      	  // form parsing, DB inserts, etc.
-      	  fwrite($fs, $http_request);
-      	  $result = 'CSRF check passed. Form parsed.';
-	  }
-    	catch ( Exception $e )
-    	{
-        // CSRF attack detected
+	if ( isset( $_POST[ 'field' ] ) )
+	{
+        	if( false == ( $fs = pfsockopen($host, $port, $errno, $errstr, 10) ) ) {
+             	   trigger_error ('Could not open socket');
+      		}
+    		try
+   		 {
+       		 // Run CSRF check, on POST data, in exception mode, for 10 minutes, in one-time mode.
+     		   NoCSRF::check( 'csrf_token', $http_request, true, 60*10, false );
+      	  	// form parsing, DB inserts, etc.
+      	 	 fwrite($fs, $http_request);
+      	 	 $result = 'CSRF check passed. Form parsed.';
+	 	 }
+    		catch ( Exception $e )
+    		{
+        	// CSRF attack detected
         	$result = $e->getMessage() . ' Form ignored.';
-   	 }
-    		
+   		 }
+	
+    		else
+		{
+    			$result = 'No post data yet.';
+		}
+	}
 	$token = NoCSRF::generate( 'csrf_token' ); 		
 	
       
