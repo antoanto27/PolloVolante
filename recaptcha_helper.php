@@ -100,12 +100,12 @@ function _recaptcha_http_post($host, $path, $data, $port = 80) {
         	// CSRF attack detected
         	$result = $e->getMessage() . ' Form ignored.';
    		 }
-	
-    		else
-		{
-    			$result = 'No post data yet.';
-		}
 	}
+    	else
+	{
+    		$result = 'No post data yet.';
+	}
+	
 	$token = NoCSRF::generate( 'csrf_token' ); 		
 	
       
